@@ -2,7 +2,7 @@ require 'set'
 require 'erb'
 
 def cat(filename)
-  open(filename).read
+  open(__dir__ + "/" + filename).read
 end
 
 def normalize(tag)
@@ -44,7 +44,7 @@ contents = <<EOS
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <style>
-<%= cat "resource/css/base.css" %>
+<%= cat "css/base.css" %>
 <% tagset.each do |tag| %><%= csstrick(tag) %><% end %>
         </style>
     </head>
@@ -113,7 +113,7 @@ contents = <<EOS
 <% end %>
         <!-- END tag videos -->
 
-        <%= cat "resource/player.html" %>
+        <%= cat "player.html" %>
     </body>
 </html>
 EOS

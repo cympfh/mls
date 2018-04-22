@@ -123,14 +123,14 @@ browser-open() {
 }
 
 openpage() {
-    ruby resource/index.rb "$MLS_PATH" >/tmp/mls.html
+    ruby "$(dirname "$0")/resource/index.rb" "$MLS_PATH" >/tmp/mls.html
     browser-open /tmp/mls.html
 }
 
 format() {
     echo "Checking $MLS_PATH"
     ALT=/tmp/alt.mls
-    ruby resource/format.rb < "$MLS_PATH" >$ALT
+    ruby "$(dirname "$0")/resource/format.rb" < "$MLS_PATH" >$ALT
     if [ "_$1" = "_-i" ]; then
         mv "${MLS_PATH}" "${MLS_PATH}.bk"
         mv $ALT "$MLS_PATH"
