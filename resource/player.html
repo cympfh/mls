@@ -1,0 +1,34 @@
+<!-- BEGIN src/player.html -->
+<section class="hero" style="width: 100%; height: 400px"></section>
+<div id="player" style="position: fixed; right: 0; bottom: 0;"></div>
+<script>
+function play(type, id) {
+    var playerNode = document.getElementById('player');
+    while (playerNode.firstChild) {
+        playerNode.removeChild(playerNode.firstChild);
+    }
+
+    if (type === 'Y') {
+
+      var s = document.createElement("iframe");
+      s.width = "720";
+      s.height = "560";
+      s.frameborder = "0";
+      s.gesture = "media";
+      s.allow = "encrypted-media";
+      s.allowfullscreen = "allowfullscreen";
+      s.src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`;
+      playerNode.appendChild(s);
+
+    } else if (type === 'N') {
+
+      var s = document.createElement("script");
+      s.type = "text/javascript";
+      s.src = `https://embed.nicovideo.jp/watch/${id}/script?w=720&h=560`;
+      playerNode.appendChild(s);
+
+    }
+
+}
+</script>
+<!-- END src/player.html -->

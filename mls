@@ -1,0 +1,158 @@
+#!/bin/bash
+
+if [ -z "$MLS_PATH" ]; then
+    MLS_PATH=$HOME/.mls
+fi
+
+usage() {
+    cat <<EOM
+SYNOPSIS
+
+    $0 play
+        open the playlist page
+
+    $0 import <watch_page_url>
+        import the video to mylist (append to $MLS_PATH)
+
+    $0 format [OPTIONS]
+        lint "$MLS_PATH"
+
+        OPTIONS
+            -i   lint and formatten (overwrite)
+
+    $0 help
+        print this
+
+MYLIST FILE
+
+    Mylist is stored as a tsv file (default '~/.mls' or \$MLS_PATH).
+
+EXAMPLES
+
+    $0 import https://www.youtube.com/watch?v=FfKAucTgvYA
+    $0 import http://www.nicovideo.jp/watch/sm9
+
+EOM
+    exit 0
+}
+
+get-type() {
+    case "$1" in
+        *youtube* | *y2be* )
+            echo Y
+            ;;
+        *nico* )
+            echo N
+            ;;
+    esac
+}
+
+get-cid() {
+    CID=$1
+    CID=${CID%%&*}
+    CID=${CID##*?=}
+    CID=${CID##*/}
+    echo "$CID"
+}
+
+get-title() {
+    ID=$1
+    TYPE=$2
+
+    case "$TYPE" in
+        Y )
+            TITLE=$( curl -s "https://www.youtube.com/watch?v=$ID" | grep '<title>' |
+                     sed 's#.*<title>\(.*\)</title>.*#\1#' | sed 's/-\? \?YouTube$//g' )
+            ruby -e "require 'cgi'; puts CGI.unescapeHTML('$TITLE'.strip)"
+            ;;
+        N )
+            URL="http://www.nicovideo.jp/watch/$ID"
+            curl -sL "${URL}" | tr -d '\n' | grep -o "<title>[^<]*" | sed 's/<title>//g; s/ - .*$//g'
+            ;;
+    esac
+}
+
+enum-all-tags() {
+    grep -v '^ *#' "$MLS_PATH" | grep '	' |
+    cut -d'	' -f 4 |
+    sed 's/,/\n/g' |
+    LC_ALL=C sort | LC_ALL=C uniq
+}
+
+read-tags() {
+    TAGS=
+    while :; do
+        tag=$(
+            (
+                echo "* DONE"
+                echo "* NEW"
+                enum-all-tags
+            ) |
+            peco --prompt "TAGS ($TAGS) >"
+        )
+        if [ "$tag" = "* DONE" ]; then
+            echo $TAGS
+            break
+        elif [ "$tag" = "* NEW" ]; then
+            echo -n "TYPE NEW TAG > " >&2
+            read tag
+        fi
+        if [ -z "$TAGS" ]; then
+            TAGS=$tag
+        else
+            TAGS="$TAGS,$tag"
+        fi
+    done
+}
+
+import() {
+    URL=$1
+    ID=$(get-cid "$URL")
+    TYPE=$(get-type "$URL")
+    TITLE=$(get-title "$ID" "$TYPE")
+    TAGS=$(read-tags)
+    printf -- "${TYPE}\t${ID}\t${TITLE}\t${TAGS}\n" | tee -a "$MLS_PATH"
+}
+
+browser-open() {
+    if which firefox >/dev/null; then
+        firefox "$1"
+    else
+        open "$1"
+    fi
+}
+
+openpage() {
+    ruby resource/index.rb "$MLS_PATH" >/tmp/mls.html
+    browser-open /tmp/mls.html
+}
+
+format() {
+    echo "Checking $MLS_PATH"
+    ALT=/tmp/alt.mls
+    ruby resource/format.rb < "$MLS_PATH" >$ALT
+    if [ "_$1" = "_-i" ]; then
+        mv "${MLS_PATH}" "${MLS_PATH}.bk"
+        mv $ALT "$MLS_PATH"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit
+fi
+
+case "$1" in
+    p | play )
+        openpage
+        ;;
+    i | import )
+        import "$2"
+        ;;
+    format )
+        format "$2"
+        ;;
+    * )
+        usage
+        ;;
+esac

@@ -1,0 +1,12 @@
+body {
+    padding: 5px 3%;
+}
+div.box {
+    margin: 10px;
+    float: left;
+    width: 400px;
+    max-width: 400px;
+    height: 135px;
+    max-height: 135px;
+    overflow: hidden;
+}
