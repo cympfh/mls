@@ -13,6 +13,13 @@ def num_of_cid(cid)
   cid.gsub(/^[a-z]*/, '')
 end
 
+def shorten(tag)
+  # AA/bb/ccc => A/b/ccc
+  xs = tag.split('/')
+  xs.map.with_index {|t, i|
+    i < xs.size - 1 ? t[0] : t}.join('/')
+end
+
 tagset = Set.new
 videos = {}
 
@@ -57,7 +64,7 @@ contents = <<EOS
             <div class="hero-body">
                 <div class="container">
 <% tagset.each do |tag| %>
-            <a class="button" href=#<%= normalize tag %>><%= tag %></a>
+            <a class="button" href=#<%= normalize tag %>><%= shorten tag %></a>
 <% end %>
                 </div>
             </div>
