@@ -6,32 +6,47 @@ fi
 
 usage() {
     cat <<EOM
+NAME
+    mls - mylist manager for YouTube, Nicovideo
+
 SYNOPSIS
 
-    $0 play
-        open the playlist page
+    mls play
+        open your playlist page
 
-    $0 import <watch_page_url>
-        import the video to mylist (append to $MLS_PATH)
+    mls import <watch_page_url>
+        import (append) the video info to your mylist
 
-    $0 format [OPTIONS]
+    mls format [OPTIONS]
         lint "$MLS_PATH"
 
         OPTIONS
             -i   lint and formatten (overwrite)
 
-    $0 help
+    mls help
         print this
 
 MYLIST FILE
 
-    Mylist is stored as a tsv file (default '~/.mls' or \$MLS_PATH).
+    Mylist is stored as a tsv file. The path is \$MLS_PATH or ~/.mls;
+    Your MLS_PATH is $MLS_PATH now.
 
 EXAMPLES
 
-    $0 import https://www.youtube.com/watch?v=FfKAucTgvYA
-    $0 import http://www.nicovideo.jp/watch/sm9
+    mls import https://www.youtube.com/watch?v=FfKAucTgvYA
+    mls import http://www.nicovideo.jp/watch/sm9
 
+EOM
+    exit 0
+}
+
+usage-short() {
+    cat <<EOM
+Usage: mls [command]
+The command is
+    import
+    play
+See --help for more information.
 EOM
     exit 0
 }
@@ -138,7 +153,7 @@ format() {
 }
 
 if [ $# -eq 0 ]; then
-    usage
+    usage-short
     exit
 fi
 
@@ -152,7 +167,10 @@ case "$1" in
     format )
         format "$2"
         ;;
-    * )
+    help | -h | --help )
         usage
+        ;;
+    * )
+        usage-short
         ;;
 esac
