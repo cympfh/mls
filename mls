@@ -17,6 +17,9 @@ SYNOPSIS
     mls import <watch_page_url>
         import (append) the video info to your mylist
 
+    mls grep <watch_page_url>
+        grep
+
     mls format [OPTIONS]
         lint "$MLS_PATH"
 
@@ -44,8 +47,10 @@ usage-short() {
     cat <<EOM
 Usage: mls [command]
 The command is
-    import
     play
+    import
+    grep
+    format
 See --help for more information.
 EOM
     exit 0
@@ -129,6 +134,12 @@ import() {
     printf -- "${TYPE}\t${ID}\t${TITLE}\t${TAGS}\n" | tee -a "$MLS_PATH"
 }
 
+mygrep() {
+    URL=$1
+    ID=$(get-cid "$URL")
+    grep "$ID" "$MLS_PATH"
+}
+
 browser-open() {
     if which firefox >/dev/null; then
         firefox "$1"
@@ -163,6 +174,9 @@ case "$1" in
         ;;
     i | import )
         import "$2"
+        ;;
+    grep )
+        mygrep "$2"
         ;;
     format )
         format "$2"
