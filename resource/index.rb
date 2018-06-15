@@ -23,17 +23,26 @@ end
 tagset = Set.new
 videos = {}
 
-open(ARGV[0]).each_line do |line|
+new_num = 20
+new_tag = "new"
+videos[new_tag] = []
+
+lines = open(ARGV[0]).readlines
+num = lines.size
+lines.each_with_index do |line, i|
   type, cid, title, tags = line.chomp.split("\t")
   tags = tags.split(",")
+  v = [type, cid, title, tags]
   tags.each {|t|
     tagset << t
     videos[t] = [] if videos[t] == nil
-    videos[t] << [type, cid, title, tags]
+    videos[t] << v
   }
+  videos[new_tag] << v if i > num - new_num
 end
 
 tagset = tagset.to_a.sort
+tagset << new_tag
 
 def csstrick(tag)
 <<EOM
