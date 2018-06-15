@@ -89,7 +89,8 @@ get-title() {
             URL="http://www.nicovideo.jp/watch/$ID"
             curl -sL "${URL}" | tr -d '\n' | grep -o "<title>[^<]*" | sed 's/<title>//g; s/ - .*$//g'
             ;;
-    esac
+    esac |
+    nkf --ic=UTF8-MAC
 }
 
 enum-all-tags() {
