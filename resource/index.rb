@@ -42,6 +42,11 @@ lines.each_with_index do |line, i|
 end
 
 tagset = tagset.to_a.sort
+if ARGV[1] == "--shuffle"
+  tagset.each do |tag|
+    videos[tag].shuffle!
+  end
+end
 tagset << new_tag
 
 def csstrick(tag)

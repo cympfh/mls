@@ -11,8 +11,11 @@ NAME
 
 SYNOPSIS
 
-    mls play
+    mls play [OPTIONS]
         open your playlist page
+
+        OPTIONS
+            --shuffle
 
     mls import <watch_page_url>
         import (append) the video info to your mylist
@@ -150,7 +153,7 @@ browser-open() {
 }
 
 openpage() {
-    ruby "$(dirname "$0")/resource/index.rb" "$MLS_PATH" >/tmp/mls.html
+    ruby "$(dirname "$0")/resource/index.rb" "$MLS_PATH" "$1" >/tmp/mls.html
     browser-open /tmp/mls.html
 }
 
@@ -171,7 +174,7 @@ fi
 
 case "$1" in
     p | play )
-        openpage
+        openpage "$2"
         ;;
     i | import )
         import "$2"
