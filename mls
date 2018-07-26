@@ -89,8 +89,8 @@ get-title() {
             ruby -e "require 'cgi'; puts CGI.unescapeHTML('$TITLE'.strip)"
             ;;
         N )
-            URL="http://www.nicovideo.jp/watch/$ID"
-            curl -sL "${URL}" | tr -d '\n' | grep -o "<title>[^<]*" | sed 's/<title>//g; s/ - .*$//g'
+            curl -s "http://api.ce.nicovideo.jp/nicoapi/v1/video.info?v=${ID}" |
+                grep "<title>" | sed 's/^ *//g; s/<[^>]*>//g'
             ;;
     esac |
     nkf --ic=UTF8-MAC
